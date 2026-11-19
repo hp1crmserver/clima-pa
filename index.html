@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b2d4f">
+<title>HP1CRM Weather Monitor v1.5 · Hora de Panamá</title>
+<style>
+:root{--navy:#082744;--blue:#1267a5;--blue2:#1b8bd1;--red:#d92d3a;--white:#fff;--bg:#eef3f8;--ink:#182b3c;--muted:#627487;--line:#d6e0e9;--green:#16845b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:#fff;padding:22px clamp(16px,4vw,42px);box-shadow:0 4px 18px #08274424}
+.top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;gap:10px;align-items:center}.logo{width:48px;height:48px;border:2px solid #ffffffa8;border-radius:12px;display:grid;place-items:center;font-size:24px;background:#ffffff12}.brand h1{font-size:clamp(20px,3vw,29px);margin:0;letter-spacing:.2px}.brand p{margin:5px 0 0;color:#d8eaf8;font-size:13px}.version{background:#ffffff18;border:1px solid #ffffff60;border-radius:20px;padding:8px 12px;font-size:12px;white-space:nowrap}.header-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}.panama-clock{display:flex;flex-direction:column;gap:3px;min-width:146px;padding:8px 12px;border:1px solid #ffffff60;border-radius:12px;background:#ffffff12}.clock-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#d8eaf8;font-weight:800}.clock-time{font-size:18px;line-height:1.1;font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:#fff}.clock-date{font-size:11px;color:#d8eaf8}
+main{max-width:1400px;margin:auto;padding:24px clamp(12px,3vw,32px) 40px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}.btn{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer;font-size:13px}.btn-primary{background:var(--blue);color:#fff}.btn-red{background:var(--red);color:#fff}.btn-light{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn:focus-visible{outline:3px solid #80c7ff;outline-offset:2px}
+.status{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:#a3afbb;display:inline-block}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.source{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px #12334a08}.source-head{padding:17px 18px;background:#f8fbfd;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}.source-icon{width:38px;height:38px;display:grid;place-items:center;background:#e2f1fc;color:var(--blue);border-radius:10px;font-size:19px;flex-shrink:0}.source h2{font-size:16px;margin:0 0 5px}.source-head p{font-size:12px;color:var(--muted);margin:0;line-height:1.4}.source-body{padding:18px;min-height:112px}.source-title{font-weight:750;line-height:1.45;margin:0 0 8px}.meta{font-size:12px;color:var(--muted);margin:0}.source-actions{padding:0 18px 18px;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.source-actions a{font-size:12px;color:var(--blue);font-weight:700;text-decoration:none;white-space:nowrap}.source-actions a:hover{text-decoration:underline}.source-actions .btn{padding:8px 10px;font-size:11px;white-space:nowrap}.source-actions .btn:disabled{opacity:.55;cursor:not-allowed}.tag{font-size:10px;letter-spacing:.4px;text-transform:uppercase;font-weight:800;border-radius:5px;padding:5px 7px;background:#edf2f6;color:#526477}.tag.new{background:#ffeaeb;color:#b51f2c}
+.radar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}.radar-panel{min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px #12334a08}.radar-head{padding:16px 18px;background:#f8fbfd;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.radar-head h2{font-size:16px;margin:0 0 5px}.radar-head p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}.radar-stage{width:100%;height:470px;background:#eaf0f6;display:flex;align-items:center;justify-content:center;overflow:hidden}.radar-image{width:100%;height:100%;max-height:470px;object-fit:contain}.radar-frame{width:100%;height:470px;border:0;display:block;background:#edf2f6}.radar-foot{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;line-height:1.5;color:var(--muted);border-top:1px solid var(--line)}.radar-foot a{color:var(--blue);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap}.radar-foot a:hover{text-decoration:underline}.radar-reload{padding:7px 9px;font-size:11px}
+.panel{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}.panel h2{font-size:16px;margin:0 0 12px}.settings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.setting{font-size:13px;color:var(--muted)}.setting label{display:block;margin-bottom:7px;font-weight:700;color:var(--ink)}input[type=number],select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}.checkrow{display:flex;gap:9px;align-items:center;min-height:40px;color:var(--ink);font-weight:600}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 0 0}.log{max-height:180px;overflow:auto;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#526477}.logline{padding:5px 0;border-bottom:1px solid #edf1f5}
+footer{text-align:center;padding:22px;color:#748495;font-size:11px}
+.overlay{position:fixed;inset:0;background:#061a2ed9;z-index:20;display:none;align-items:center;justify-content:center;padding:18px}.overlay.show{display:flex}.popup{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:17px;box-shadow:0 24px 90px #0007;border-top:7px solid var(--red)}.popup-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line)}.alert-label{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:850;color:var(--red);letter-spacing:.7px;text-transform:uppercase}.pulse{width:10px;height:10px;background:var(--red);border-radius:50%;box-shadow:0 0 0 5px #d92d3a1a}.close{background:#edf2f6;border:0;border-radius:8px;width:34px;height:34px;font-size:21px;cursor:pointer}.popup-content{padding:24px}.popup-content h2{font-size:clamp(21px,4vw,29px);line-height:1.25;margin:0 0 12px}.popup-content .details{font-size:13px;color:var(--muted);margin-bottom:18px}.popup-content .body{line-height:1.65;white-space:pre-line;font-size:14px;color:#344a5d;max-height:36vh;overflow:auto}.popup-foot{padding:16px 22px;background:#f7f9fb;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+.tides-panel{margin-top:22px}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}.section-head h2{font-size:18px;margin:0 0 6px;color:var(--navy)}.section-head p{font-size:12px;line-height:1.5;color:var(--muted);margin:0;max-width:740px}.tide-status{font-size:12px;color:var(--muted);margin:8px 0 14px;line-height:1.5}.tide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.tide-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}.tide-card-head{padding:13px 15px;background:#f8fbfd;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}.tide-card-head h3{font-size:15px;margin:0;color:var(--navy)}.tide-pill{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 7px;border-radius:6px;background:#e5f1fc;color:var(--blue)}.tide-table-wrap{overflow-x:auto}.tide-table{width:100%;border-collapse:collapse;font-size:12px;min-width:340px}.tide-table th,.tide-table td{text-align:left;padding:10px 12px;border-bottom:1px solid #edf1f5;white-space:nowrap}.tide-table th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#fbfcfe}.tide-table tr:last-child td{border-bottom:0}.tide-event{font-weight:750;color:var(--ink)}.tide-event.high:before{content:"↑ ";color:var(--blue)}.tide-event.low:before{content:"↓ ";color:var(--red)}.tide-empty{color:var(--muted);text-align:center!important;padding:20px!important;white-space:normal!important}.tides-note{font-size:11px;color:var(--muted);line-height:1.5;margin:14px 0 0}.portal-panel{margin-top:22px;padding:0;overflow:hidden}.portal-panel .section-head{padding:18px 20px;margin:0;border-bottom:1px solid var(--line);background:#f8fbfd}.portal-frame-wrap{background:#eaf0f6}.portal-frame{width:100%;height:760px;min-height:560px;border:0;display:block;background:#edf2f6}.portal-foot{padding:13px 18px;display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);font-size:11px;line-height:1.5;color:var(--muted)}.portal-foot a{color:var(--blue);font-weight:750;text-decoration:none;white-space:nowrap}.portal-foot a:hover{text-decoration:underline}
+
+.hp1-logo{width:54px;height:54px;object-fit:contain;border-radius:12px;background:#fff;padding:5px;border:2px solid #ffffffb8;box-shadow:0 3px 12px #001b331f;flex:0 0 54px}.source.updated,.tide-card.updated{animation:recentPulse 1.25s ease-in-out infinite;box-shadow:0 0 0 3px #ffcf3d80,0 8px 24px #d9a40035;border-color:#e3b200}.source.updated .source-head,.tide-card.updated .tide-card-head{background:#fff9dc}.recent-badge{display:inline-flex;align-items:center;gap:5px;margin-left:6px;font-size:9px;letter-spacing:.04em;text-transform:uppercase;font-weight:900;color:#8a6200;background:#ffe88a;border-radius:999px;padding:4px 7px}.source-actions{justify-content:flex-start}.source-actions .spacer{flex:1}.share-btn{background:#f2f7fb;color:var(--blue);border:1px solid #cddde9}.share-btn:hover{background:#e7f2fa}.tide-card-head .share-btn{padding:7px 9px;font-size:11px}.share-popup{width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:17px;box-shadow:0 24px 90px #0007;border-top:7px solid var(--blue)}.share-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line)}.share-head h2{font-size:20px;margin:0;color:var(--navy)}.share-content{padding:20px 22px}.share-preview{padding:13px 14px;background:#f7f9fb;border:1px solid var(--line);border-radius:10px;font-size:13px;line-height:1.5;color:#344a5d;margin-bottom:16px;max-height:150px;overflow:auto}.share-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.share-option{display:flex;align-items:center;gap:9px;justify-content:flex-start;border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px 13px;cursor:pointer;font-weight:750;color:var(--ink);font-size:13px}.share-option:hover{background:#f4f8fb;border-color:#b8cfdf}.share-option .share-icon{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:#eaf3f9;color:var(--blue);font-weight:900}.share-foot{padding:14px 22px;background:#f7f9fb;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}.share-foot .btn{min-width:100px}@keyframes recentPulse{0%,100%{transform:translateZ(0);box-shadow:0 0 0 2px #ffcf3d55,0 4px 14px #12334a08}50%{transform:translateY(-2px);box-shadow:0 0 0 5px #ffcf3d99,0 10px 28px #d9a40055}}
+@media(max-width:900px){.header-right{margin-left:auto}.grid{grid-template-columns:1fr}.source-body{min-height:0}.radar-grid{grid-template-columns:1fr}.tide-grid{grid-template-columns:1fr}.portal-frame{height:700px}.radar-stage,.radar-frame{height:420px}.radar-image{max-height:420px}.settings{grid-template-columns:repeat(2,minmax(0,1fr))}.status{margin-left:0;width:100%}}
+@media(max-width:520px){.top{align-items:flex-start}.header-right{width:100%;justify-content:flex-start}.panama-clock{flex:1;min-width:145px}.settings{grid-template-columns:1fr}.toolbar .btn{flex:1}.popup-foot .btn{flex:1}.radar-stage,.radar-frame{height:350px}.radar-image{max-height:350px}.radar-head{flex-direction:column}.portal-frame{height:640px;min-height:480px}.section-head{align-items:stretch}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand"><img class="hp1-logo" src="logo%20blanco.png" alt="Logo HP1CRM" referrerpolicy="no-referrer"><div class="logo">⛈</div><div><h1>HP1CRM Weather Monitor</h1><p>Los datos mostrados conservan la autoría de sus fuentes originales: ACP e IMHPA.</p></div></div>
+    <div class="header-right"><div class="panama-clock" aria-label="Hora local de Panamá, GMT menos cinco"><span class="clock-label">Hora local · Panamá GMT−5</span><span class="clock-time" id="panamaClock">--:--:--</span><span class="clock-date" id="panamaDate">Cargando fecha…</span></div><div class="version">VERSIÓN 1.5</div></div>
+  </div>
+</header>
+<main>
+  <div class="toolbar">
+    <button class="btn btn-primary" id="checkNow">↻ Consultar ahora</button>
+    <button class="btn btn-red" id="enableNotifications">Activar notificaciones</button>
+    <button class="btn btn-light" id="enableSound">Activar sonido</button>
+    <button class="btn btn-light" id="testPopup">Probar popup</button>
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Iniciando monitor…</span><span>·</span><span id="lastCheck">Sin consulta</span></div>
+  </div>
+
+  <section class="grid" id="sources">
+    <article class="source" data-source="pronostico">
+      <div class="source-head"><div class="source-icon">☁</div><div><h2>Actualización del pronóstico</h2><p>Últimos reportes del tiempo</p></div></div>
+      <div class="source-body"><p class="source-title">Esperando la primera consulta…</p><div class="meta">Publicación más reciente aún no disponible</div></div>
+      <div class="source-actions"><span class="tag">Pronóstico</span><button class="btn btn-primary" type="button" data-popup-source="pronostico" disabled>Ver notificación</button><button class="btn share-btn" type="button" data-share-source="pronostico">Compartir ↗</button><span class="spacer"></span><a target="_blank" rel="noopener" href="https://www.imhpa.gob.pa/es/actualizacion-del-pronostico-del-tiempo/">Abrir fuente ↗</a></div>
+    </article>
+    <article class="source" data-source="avisos">
+      <div class="source-head"><div class="source-icon">⚑</div><div><h2>Aviso de advertencia</h2><p>Avisos y advertencias meteorológicas</p></div></div>
+      <div class="source-body"><p class="source-title">Esperando la primera consulta…</p><div class="meta">Publicación más reciente aún no disponible</div></div>
+      <div class="source-actions"><span class="tag">Advertencia</span><button class="btn btn-primary" type="button" data-popup-source="avisos" disabled>Ver notificación</button><button class="btn share-btn" type="button" data-share-source="avisos">Compartir ↗</button><span class="spacer"></span><a target="_blank" rel="noopener" href="https://www.imhpa.gob.pa/es/avisos/">Abrir fuente ↗</a></div>
+    </article>
+    <article class="source" data-source="vigilancia">
+      <div class="source-head"><div class="source-icon">⚠</div><div><h2>Aviso de vigilancia</h2><p>Alertas y vigilancias meteorológicas</p></div></div>
+      <div class="source-body"><p class="source-title">Esperando la primera consulta…</p><div class="meta">Publicación más reciente aún no disponible</div></div>
+      <div class="source-actions"><span class="tag">Vigilancia</span><button class="btn btn-primary" type="button" data-popup-source="vigilancia" disabled>Ver notificación</button><button class="btn share-btn" type="button" data-share-source="vigilancia">Compartir ↗</button><span class="spacer"></span><a target="_blank" rel="noopener" href="https://www.imhpa.gob.pa/es/aviso-vigilancia/">Abrir fuente ↗</a></div>
+    </article>
+  </section>
+
+  <section class="panel tides-panel" id="tidesPanel" aria-labelledby="tidesTitle">
+    <div class="section-head">
+      <div><h2 id="tidesTitle">Tabla de mareas · Pacífico y Caribe</h2><p>Datos extraídos de la página oficial del Instituto de Meteorología e Hidrología de Panamá (IMHPA). Los horarios se muestran en hora local de Panamá (GMT−5).</p></div>
+      <button class="btn btn-light" id="refreshTides" type="button">↻ Actualizar mareas</button>
+    </div>
+    <div class="tide-status" id="tideStatus" role="status" aria-live="polite">Consultando la tabla oficial de mareas…</div>
+    <div class="tide-grid">
+      <article class="tide-card" data-tide-region="pacifico" aria-labelledby="pacificTideTitle">
+        <div class="tide-card-head"><h3 id="pacificTideTitle">Océano Pacífico</h3><div><span class="tide-pill">Pacífico</span><button class="btn share-btn" type="button" data-share-tide="pacifico">Compartir ↗</button></div></div>
+        <div class="tide-table-wrap"><table class="tide-table"><thead><tr><th>Evento</th><th>Hora</th><th>Nivel (ft)</th><th>Nivel (m)</th></tr></thead><tbody id="tidePacificRows"><tr><td class="tide-empty" colspan="4">Esperando datos oficiales…</td></tr></tbody></table></div>
+      </article>
+      <article class="tide-card" data-tide-region="caribe" aria-labelledby="caribbeanTideTitle">
+        <div class="tide-card-head"><h3 id="caribbeanTideTitle">Mar Caribe</h3><div><span class="tide-pill">Caribe</span><button class="btn share-btn" type="button" data-share-tide="caribe">Compartir ↗</button></div></div>
+        <div class="tide-table-wrap"><table class="tide-table"><thead><tr><th>Evento</th><th>Hora</th><th>Nivel (ft)</th><th>Nivel (m)</th></tr></thead><tbody id="tideCaribbeanRows"><tr><td class="tide-empty" colspan="4">Esperando datos oficiales…</td></tr></tbody></table></div>
+      </article>
+    </div>
+    <p class="tides-note">Fuente original: <a href="https://www.imhpa.gob.pa/es/" target="_blank" rel="noopener">IMHPA · página principal</a>. La tabla se reconstruye con los datos publicados por el sitio; si el formato o el acceso de la fuente cambia, se mostrará un estado de error en lugar de inventar valores.</p>
+  </section>
+
+  <section class="radar-grid" aria-label="Radares y mapas meteorológicos">
+    <article class="radar-panel">
+      <div class="radar-head"><div><h2>Radar meteorológico ACP · Animación</h2><p>Animación de precipitación de la Autoridad del Canal de Panamá.</p></div><button class="btn btn-light radar-reload" id="reloadAcpRadar" type="button">↻ Actualizar radar</button></div>
+      <div class="radar-stage"><img class="radar-image" id="acpRadarImage" src="https://radar-meteorologico.delcanal.com/movie.gif" alt="Animación del radar meteorológico de la ACP" loading="lazy" referrerpolicy="no-referrer"></div>
+      <div class="radar-foot"><span>Fuente: Autoridad del Canal de Panamá (ACP). La animación depende de la disponibilidad del servidor externo.</span><a href="https://pancanal.com/radar-meteorologico/" target="_blank" rel="noopener">Abrir radar oficial ↗</a></div>
+    </article>
+    <article class="radar-panel">
+      <div class="radar-head"><div><h2>Visor meteorológico SERVIR · Panamá</h2><p>Mapa regional interactivo centrado en Panamá. Las capas disponibles se controlan dentro del visor.</p></div></div>
+      <iframe class="radar-frame" id="servirMap" title="Mapa regional SERVIR centrado en Panamá" src="https://www.servir.net/servir_alertas/index-new.php?cant=1&amp;lat=8.7&amp;layer=blank&amp;lon=-80.2&amp;zoom=6" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <div class="radar-foot"><span>El visor público de SERVIR ofrece capas regionales como satélite GOES infrarrojo y vientos GFS; no se pudo confirmar una capa independiente de radar de precipitación. Si el visor no se muestra incrustado, ábrelo con el enlace.</span><a href="https://www.servir.net/servir_alertas/index-new.php?cant=1&amp;lat=8.7&amp;layer=blank&amp;lon=-80.2&amp;zoom=6" target="_blank" rel="noopener">Abrir mapa SERVIR ↗</a></div>
+    </article>
+  </section>
+
+  <section class="panel portal-panel" aria-labelledby="portalTitle">
+    <div class="section-head">
+      <div><h2 id="portalTitle">Portal de Vigilancia Hidrometeorológica · IMHPA</h2><p>Portal oficial con estaciones hidrológicas y meteorológicas, mareas y otros productos de vigilancia.</p></div>
+      <a class="btn btn-primary" href="https://www.imhpa.gob.pa/es/portal-vigilancia" target="_blank" rel="noopener" style="text-decoration:none">Abrir portal oficial ↗</a>
+    </div>
+    <div class="portal-frame-wrap"><iframe class="portal-frame" id="imhpaVigilancePortal" title="Portal de Vigilancia Hidrometeorológica del IMHPA" src="https://www.imhpa.gob.pa/es/portal-vigilancia" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+    <div class="portal-foot"><span>Fuente: Instituto de Meteorología e Hidrología de Panamá (IMHPA). Si el navegador o el servidor oficial impide la inserción del portal, usa el enlace para abrirlo en una pestaña nueva.</span><a href="https://www.imhpa.gob.pa/es/portal-vigilancia" target="_blank" rel="noopener">Abrir en IMHPA ↗</a></div>
+  </section>
+
+  <section class="panel">
+    <h2>Configuración del monitor</h2>
+    <div class="settings">
+      <div class="setting"><label for="interval">Intervalo de consulta</label><select id="interval"><option value="30">Cada 30 segundos</option><option value="60">Cada 1 minuto</option><option value="120">Cada 2 minutos</option><option value="300">Cada 5 minutos</option><option value="600" selected>Cada 10 minutos</option></select></div>
+      <div class="setting"><label>Notificación visual</label><div class="checkrow"><input type="checkbox" id="visualEnabled" checked><span>Popup al detectar novedad</span></div></div>
+      <div class="setting"><label>Notificación sonora</label><div class="checkrow"><input type="checkbox" id="soundEnabled"><span>Reproducir alerta</span></div></div>
+      <div class="setting"><label>Primera consulta</label><div class="checkrow"><input type="checkbox" id="showInitial" checked><span>Mostrar publicación actual al iniciar</span></div></div>
+    </div>
+    <p class="hint">El navegador puede exigir que esta página permanezca abierta. Las notificaciones del sistema requieren permiso y normalmente un sitio servido por HTTPS o localhost. El audio requiere una interacción previa del usuario. Al instalarlo en CasaOS, el monitor consulta primero el intermediario local del servidor (/api/fetch), lo que evita CORS del navegador. Los proxies públicos quedan como respaldo si el intermediario local no está disponible.</p>
+  </section>
+
+  <section class="panel"><h2>Registro de actividad</h2><div class="log" id="log"><div class="logline">Monitor preparado. Pulsa «Consultar ahora» para iniciar la verificación.</div></div></section>
+</main>
+<footer>HP1CRM Weather Monitor v1.4b · Fuentes originales: Autoridad del Canal de Panamá (ACP) e Instituto de Meteorología e Hidrología de Panamá (IMHPA). Verifica siempre la publicación original antes de tomar decisiones operativas.</footer>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+  <div class="popup">
+    <div class="popup-top"><div class="alert-label"><span class="pulse"></span><span id="popupLabel">Nueva publicación detectada</span></div><button class="close" id="closePopup" aria-label="Cerrar">×</button></div>
+    <div class="popup-content"><h2 id="popupTitle">Actualización meteorológica</h2><div class="details" id="popupMeta"></div><img id="popupImage" alt="Imagen de la publicación meteorológica" style="display:none;width:100%;height:auto;border-radius:9px;margin:0 0 16px;border:1px solid #d6e0e9"><div class="body" id="popupBody"></div></div>
+    <div class="popup-foot"><button class="btn share-btn" id="sharePopup" type="button">Compartir ↗</button><button class="btn btn-light" id="dismissPopup">Cerrar</button><a class="btn btn-primary" id="popupLink" target="_blank" rel="noopener" style="text-decoration:none" href="#">Ver publicación oficial ↗</a></div>
+  </div>
+</div>
+<div class="overlay" id="shareOverlay" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="share-popup">
+    <div class="share-head"><h2 id="shareTitle">Compartir información</h2><button class="close" id="closeShare" aria-label="Cerrar">×</button></div>
+    <div class="share-content"><div class="share-preview" id="sharePreview">Selecciona una opción para compartir.</div><div class="share-options">
+      <button class="share-option" type="button" data-share-action="native"><span class="share-icon">↗</span>Compartir del dispositivo</button>
+      <button class="share-option" type="button" data-share-action="whatsapp"><span class="share-icon">W</span>WhatsApp</button>
+      <button class="share-option" type="button" data-share-action="telegram"><span class="share-icon">➤</span>Telegram</button>
+      <button class="share-option" type="button" data-share-action="facebook"><span class="share-icon">f</span>Facebook</button>
+      <button class="share-option" type="button" data-share-action="x"><span class="share-icon">X</span>X</button>
+      <button class="share-option" type="button" data-share-action="copy"><span class="share-icon">⧉</span>Copiar enlace y texto</button>
+      <button class="share-option" type="button" data-share-action="copy-image"><span class="share-icon">▧</span>Copiar imagen</button>
+      <button class="share-option" type="button" data-share-action="download-image"><span class="share-icon">↓</span>Descargar imagen</button>
+      <button class="share-option" type="button" data-share-action="share-image"><span class="share-icon">▣</span>Compartir imagen</button>
+    </div></div>
+    <div class="share-foot"><button class="btn btn-light" id="cancelShare">Cerrar</button></div>
+  </div>
+</div>
+<script>
+(() => {
+  "use strict";
+  const SOURCES = [
+    {id:"pronostico",route:"actualizacion-del-pronostico-del-tiempo",name:"Actualización del pronóstico",url:"https://www.imhpa.gob.pa/es/actualizacion-del-pronostico-del-tiempo/"},
+    {id:"avisos",route:"avisos",name:"Aviso de advertencia",url:"https://www.imhpa.gob.pa/es/avisos/"},
+    {id:"vigilancia",route:"aviso-vigilancia",name:"Aviso de vigilancia",url:"https://www.imhpa.gob.pa/es/aviso-vigilancia/"}
+  ];
+  const PROXIES = [
+    // Cuando el HTML se sirve desde el paquete CasaOS, consulta primero el intermediario local.
+    // Esto evita CORS del navegador y reduce la dependencia de proxies públicos.
+    {name:"Intermediario CasaOS", timeout:18000, make:url=>"/api/fetch?url="+encodeURIComponent(url)},
+    {name:"CORS.dev", timeout:11000, make:url=>"https://proxy.cors.dev/"+url},
+    {name:"AllOrigins", timeout:5500, make:url=>"https://api.allorigins.win/raw?url="+encodeURIComponent(url)},
+    {name:"CodeTabs", timeout:5500, make:url=>"https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(url)},
+    {name:"IMHPA directo", timeout:2500, make:url=>url}
+  ];
+  const $ = id => document.getElementById(id);
+  function updatePanamaClock(){
+    const now = new Date();
+    const timeFmt = new Intl.DateTimeFormat("es-PA", {
+      timeZone:"America/Panama", hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"
+    });
+    const dateFmt = new Intl.DateTimeFormat("es-PA", {
+      timeZone:"America/Panama", weekday:"long", day:"2-digit", month:"short", year:"numeric"
+    });
+    const timeEl = $("panamaClock"), dateEl = $("panamaDate");
+    if(timeEl) timeEl.textContent = timeFmt.format(now);
+    if(dateEl) dateEl.textContent = dateFmt.format(now);
+  }
+  updatePanamaClock();
+  setInterval(updatePanamaClock, 1000);
+
+  const state = {known:{},itemCache:{},initialPopupShown:{},busy:false,timer:null,audio:null,started:false,popupQueue:[],activePopup:false,routeName:"sin conexión",shareData:null,tideData:{pacifico:[],caribe:[]}};
+  const dateRe = /(?:\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}(?:\s+\d{1,2}:\d{2}\s*(?:am|pm)?)?|\d{1,2}\s+de\s+[a-záéíóú]+\s+de\s+\d{4})/i;
+
+  function log(message, type="info") {
+    const node=document.createElement("div"); node.className="logline";
+    const time=new Date().toLocaleTimeString("es-PA",{hour12:false});
+    node.textContent=`[${time}] ${message}`;
+    if(type==="error") node.style.color="#c52232";
+    $("log").prepend(node);
+    while($("log").children.length>60) $("log").lastElementChild.remove();
+  }
+  function setStatus(text, mode="ok") {
+    $("statusText").textContent=text;
+    $("statusDot").className="dot "+(mode==="ok"?"ok":mode==="bad"?"bad":"");
+  }
+  function clean(s){return (s||"").replace(/\s+/g," ").trim();}
+  function absUrl(href, base){try{return new URL(href,base).href}catch{return base}}
+  function publicationTimestamp(text){
+    const m=String(text||"").match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})\s+(\d{1,2}):(\d{2})\s*(a\.?m\.?|p\.?m\.?)?/i);
+    if(!m)return 0;
+    const day=Number(m[1]),month=Number(m[2])-1,year=Number(m[3]);
+    let hour=Number(m[4]);const minute=Number(m[5]);const meridiem=(m[6]||"").toLowerCase().replace(/\./g,"");
+    if(meridiem.startsWith("p")&&hour<12)hour+=12;
+    if(meridiem.startsWith("a")&&hour===12)hour=0;
+    const stamp=new Date(year,month,day,hour,minute).getTime();
+    return Number.isFinite(stamp)?stamp:0;
+  }
+  function isArticleLink(a, source) {
+    const href=a.getAttribute("href")||"", text=clean(a.textContent);
+    if(!text || text.length<5 || !href || href.startsWith("#") || /^javascript:/i.test(href)) return false;
+    const full=absUrl(href,source.url);
+    if(!full.startsWith("https://www.imhpa.gob.pa/")) return false;
+    if(full.replace(/\/$/,"")===source.url.replace(/\/$/,"")) return false;
+    if(/\/(es|en)\/?$/.test(full)) return false;
+    if(/contacto|iniciar-sesion|login|buscar|facebook|instagram|twitter|youtube/i.test(full+" "+text)) return false;
+    return true;
+  }
+  function parsePage(html, source) {
+    return new DOMParser().parseFromString(html,"text/html");
+  }
+  function extractLatest(doc, source) {
+    let best = null;
+    for (const a of doc.querySelectorAll("a[href]")) {
+      let u; try { u = new URL(a.getAttribute("href"), source.url); } catch { continue; }
+      if (u.hostname !== "www.imhpa.gob.pa" && u.hostname !== "imhpa.gob.pa") continue;
+      const parts = u.pathname.replace(/\/+$/,"").split("/").filter(Boolean);
+      const routeIndex = parts.lastIndexOf(source.route);
+      if (routeIndex < 0) continue;
+      const idText = parts[routeIndex + 1] || "";
+      if (!/^\d+$/.test(idText)) continue;
+      const id = Number(idText); if (!Number.isSafeInteger(id)) continue;
+      const raw = clean(a.textContent); if (!raw || raw.length < 5) continue;
+      const dateMatch = raw.match(/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}(?:\s+\d{1,2}:\d{2}\s*(?:a\.?m\.?|p\.?m\.?)?)?/i);
+      const candidate = {
+        id:String(id), numericId:id,
+        title:raw.replace(/\*+/g,"").replace(/\s*\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}.*$/i,"").trim() || raw,
+        date:dateMatch ? dateMatch[0].replace(/\s+/g," ").trim() : "Fecha no identificada",
+        publishedAt:publicationTimestamp(raw), href:u.href, excerpt:"", body:[]
+      };
+      if (!best || candidate.publishedAt > best.publishedAt ||
+          (candidate.publishedAt === best.publishedAt && candidate.numericId > best.numericId)) best = candidate;
+    }
+    if (!best) throw new Error("No se encontraron publicaciones con el formato esperado en esta fuente. Se evita usar enlaces genéricos para no generar falsas alertas.");
+    return best;
+  }
+  function extractDetail(html, item, baseUrl) {
+    const doc=parsePage(html,{url:baseUrl});
+    const headings=[...doc.querySelectorAll("h1,h2,h3")];
+    const h1=headings.find(h=>/^(aviso|actualización del pronóstico|actualizacion del pronostico)/i.test(clean(h.textContent))) || doc.querySelector("h1") || headings[0];
+    if(!h1)throw new Error("La página de detalle no contiene un título reconocible.");
+    const BLOCK=/^(P|DIV|LI|UL|OL|H[1-6]|TR|TABLE|SECTION|ARTICLE|FIGURE|BLOCKQUOTE)$/;
+    const lines=[];let buffer="",started=false,finished=false;
+    const flush=()=>{const t=buffer.replace(/\s+/g," ").trim();if(t)lines.push(t);buffer="";};
+    (function walk(node){
+      if(finished)return;
+      if(node.nodeType===3){if(started)buffer+=node.nodeValue;return;}
+      if(node.nodeType!==1)return;
+      const tag=node.tagName;
+      if(["SCRIPT","STYLE","NOSCRIPT","NAV","FOOTER","HEADER","ASIDE"].includes(tag))return;
+      if(node===h1)started=true;
+      if(tag==="BR"){if(started)flush();return;}
+      const block=BLOCK.test(tag);if(block&&started)flush();
+      for(const child of node.childNodes)walk(child);
+      if(block&&started){
+        flush();
+        if(/^(Enlaces de Interés|Enlaces de Interes|Información de Contacto|Informacion de Contacto)/i.test(lines[lines.length-1]||"")){lines.pop();finished=true;}
+      }
+    })(doc.body);
+    const headingText=clean(h1.textContent)||item.title;
+    const title=(lines.shift()||headingText).replace(/\*+/g,"").trim();
+    let date="",pron="",validity="";const body=[];
+    for(const line of lines){
+      if(!date && /^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}\s+\d{1,2}:\d{2}/.test(line))date=line;
+      else if(!pron && /^Pronosticador:/i.test(line))pron=line.replace(/^Pronosticador:\s*/i,"");
+      else if(!validity && /^Validez Aviso:/i.test(line))validity=line.replace(/^Validez Aviso:\s*/i,"");
+      else if(!/^Image$/i.test(line))body.push(line.replace(/^\*+\s*|\s*\*+$/g,"").trim());
+    }
+    let image="";
+    for(const img of doc.querySelectorAll("img")){
+      if(!(h1.compareDocumentPosition(img)&Node.DOCUMENT_POSITION_FOLLOWING))continue;
+      if(img.closest("header,footer,nav,aside,.navbar,.footer,#sp-header,#sp-footer,.breadcrumb"))continue;
+      const src=img.getAttribute("src")||img.getAttribute("data-src")||img.getAttribute("data-lazy-src")||img.getAttribute("data-original")||"";
+      const alt=img.getAttribute("alt")||"";
+      if(!src||/(logo|favicon|sprite|social[-_ ]?icon|avatar|flag)/i.test(src+" "+alt))continue;
+      image=absUrl(src,baseUrl);break;
+    }
+    const content=body.filter(Boolean).slice(0,140);
+    if(!content.length&&!image&&!validity&&!pron)throw new Error("Se encontró la página, pero no se pudo extraer el contenido del aviso.");
+    const excerpt=content.join("\n\n")||(image?"El contenido del aviso está publicado como imagen adjunta.":"Abre la publicación oficial para consultar el contenido completo.");
+    return {title,date:date||item.date,pron,validity,body:content,image,excerpt};
+  }
+  async function fetchText(url, expectedRoute="") {
+    const errors=[];
+    for(const proxy of PROXIES){
+      const controller=new AbortController();let timedOut=false;
+      const timeout=setTimeout(()=>{timedOut=true;controller.abort();},proxy.timeout);
+      try{
+        const response=await fetch(proxy.make(url),{signal:controller.signal,cache:"no-store",credentials:"omit",headers:{"Accept":"text/html,application/xhtml+xml,text/plain,*/*"}});
+        if(!response.ok)throw new Error("HTTP "+response.status);
+        const body=await response.text();if(!body||body.length<300)throw new Error("respuesta demasiado corta");
+        const doc=parsePage(body,{url});const pageText=clean(doc.body?.textContent||"");
+        if(/access denied|cloudflare challenge|too many requests|proxy error|upstream error|invalid url/i.test(body.slice(0,3500)) && !/instituto de meteorología|instituto de meteorologia|últimos avisos|últimos reportes/i.test(body.slice(0,5000)))throw new Error("el intermediario devolvió una página de error");
+        const isHome = expectedRoute === "__home__";
+        const hasTides = /marea\s+(?:alta|baja)/i.test(pageText);
+        const hasSiteEvidence=/imhpa\.gob\.pa/i.test(body)&&(!!doc.querySelector("h1")||(isHome&&hasTides));
+        if(!hasSiteEvidence)throw new Error("respuesta no reconocible como una página del IMHPA");
+        if(isHome){
+          if(!hasTides)throw new Error("la página principal no contiene filas de mareas reconocibles");
+        }else if(expectedRoute){
+          const routeFound=[...doc.querySelectorAll("a[href]")].some(a=>{try{const u=new URL(a.getAttribute("href"),url);const parts=u.pathname.replace(/\/+$/,"").split("/").filter(Boolean);const i=parts.lastIndexOf(expectedRoute);return (u.hostname==="www.imhpa.gob.pa"||u.hostname==="imhpa.gob.pa")&&i>=0&&/^\d+$/.test(parts[i+1]||"");}catch{return false;}});
+          if(!routeFound)throw new Error("el HTML no contiene enlaces de publicaciones válidos para esta sección");
+        }else if(!doc.querySelector("h1")||!pageText)throw new Error("la página de detalle no tiene contenido reconocible");
+        state.routeName=proxy.name;
+        if(proxy!==PROXIES[0])log("Conexión alternativa utilizada: "+proxy.name+".");
+        return body;
+      }catch(e){
+        let reason;if(timedOut||e?.name==="AbortError")reason="tiempo de espera agotado ("+(proxy.timeout/1000)+" s)";
+        else if(e instanceof TypeError&&/fetch/i.test(e.message))reason="conexión bloqueada por CORS o por la red";
+        else reason=e?.message||"error de conexión desconocido";
+        errors.push(proxy.name+": "+reason);
+      }finally{clearTimeout(timeout);}
+    }
+    throw new Error(errors.join("; ")||"Ninguna ruta de conexión respondió correctamente.");
+  }
+  function normalized(item){return [String(item.href||item.id||item.numericId||"").replace(/\/+$/, ""),item.date||"",item.title||""].join("|").toLowerCase();}
+  function markCardRead(sourceId){
+    const card=document.querySelector(`[data-source="${sourceId}"]`);
+    if(card){card.classList.remove("updated");const badge=card.querySelector(".recent-badge");if(badge)badge.remove();}
+  }
+  function renderCard(source,item,isNew=false,detailOk=false){
+    const card=document.querySelector(`[data-source="${source.id}"]`);if(!card)return;
+    card.querySelector(".source-title").textContent=item.title||"Publicación meteorológica";
+    card.querySelector(".meta").textContent=item.date&&item.date!=="Fecha no identificada"?`Actualizado: ${item.date}`:"Fecha de publicación no identificada";
+    const tag=card.querySelector(".tag");tag.textContent=isNew?"Nueva publicación":"Última publicación";tag.className="tag"+(isNew?" new":"");
+    const link=card.querySelector(".source-actions a");link.href=item.href||source.url;link.textContent="Abrir fuente ↗";
+    const button=card.querySelector("[data-popup-source]");if(button){button.disabled=!detailOk;button.textContent=detailOk?"Ver notificación":"Notificación no disponible";}
+    const share=card.querySelector("[data-share-source]");if(share)share.disabled=!detailOk;
+    if(isNew){card.classList.add("updated");if(!card.querySelector(".recent-badge")){const b=document.createElement("span");b.className="recent-badge";b.textContent="Actualizado";tag.parentElement.appendChild(b);}}
+  }
+  function openShare(data){
+    state.shareData=data;
+    $("shareTitle").textContent=data.title||"Compartir información";
+    $("sharePreview").textContent=data.text||data.url||"";
+    $("shareOverlay").classList.add("show");
+  }
+  function closeShare(){state.shareData=null;$("shareOverlay").classList.remove("show");}
+  function shareCanvas(data){
+    const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+    const lines=String(data.text||data.title||"Información meteorológica").split(/\n/);
+    const width=1080,pad=64,lineH=42,maxChars=48,wrapped=[];
+    lines.forEach(line=>{if(!line){wrapped.push("");return;}while(line.length>maxChars){let cut=line.lastIndexOf(" ",maxChars);if(cut<12)cut=maxChars;wrapped.push(line.slice(0,cut));line=line.slice(cut).trim();}wrapped.push(line);});
+    const height=Math.max(520,190+wrapped.length*lineH+100);canvas.width=width;canvas.height=height;
+    const grad=ctx.createLinearGradient(0,0,width,height);grad.addColorStop(0,"#082744");grad.addColorStop(1,"#1267a5");ctx.fillStyle=grad;ctx.fillRect(0,0,width,height);
+    ctx.fillStyle="#ffffff";ctx.font="bold 42px Arial";ctx.fillText("HP1CRM WEATHER MONITOR",pad,82);
+    ctx.fillStyle="#bfe3ff";ctx.font="24px Arial";ctx.fillText("Panamá · GMT−5",pad,126);
+    ctx.fillStyle="#ffffff";ctx.font="bold 32px Arial";let y=205;
+    wrapped.forEach((line,i)=>{if(i>0&&line===""){y+=18;return;}ctx.fillText(line.slice(0,58),pad,y);y+=lineH;});
+    ctx.fillStyle="#d8eaf8";ctx.font="20px Arial";ctx.fillText("Fuente: IMHPA · Datos sujetos a actualización oficial",pad,height-48);
+    return new Promise(resolve=>canvas.toBlob(blob=>resolve(blob),"image/png"));
+  }
+  async function doShare(action){
+    const d=state.shareData;if(!d)return;
+    const text=d.text||d.title||"HP1CRM Weather Monitor";const url=d.url||location.href;
+    try{
+      if(action==="native" && navigator.share){await navigator.share({title:d.title||"HP1CRM Weather Monitor",text,url});markSharedRead(d);return;}
+      if(action==="copy"){
+        await navigator.clipboard.writeText(text+(url?"\n"+url:""));log("Enlace y texto copiados al portapapeles.");markSharedRead(d);closeShare();return;
+      }
+      if(["copy-image","download-image","share-image"].includes(action)){
+        const blob=await shareCanvas(d);if(!blob)throw new Error("No se pudo generar la imagen.");
+        if(action==="copy-image"){
+          if(!navigator.clipboard?.write||!window.ClipboardItem)throw new Error("Este navegador no permite copiar imágenes; utiliza Descargar imagen.");
+          await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);log("Imagen copiada al portapapeles.");
+        }else if(action==="download-image"){
+          const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="HP1CRM-"+(d.kind==="tide"?"Mareas":"Aviso")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);log("Imagen preparada para descargar.");
+        }else{
+          const file=new File([blob],"HP1CRM-informacion.png",{type:"image/png"});
+          if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:d.title,text});
+          else {const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="HP1CRM-informacion.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);log("El navegador no admite compartir archivos; se descargó la imagen.");}
+        }
+        markSharedRead(d);closeShare();return;
+      }
+      const encodedText=encodeURIComponent(text),encodedUrl=encodeURIComponent(url);
+      const links={whatsapp:"https://wa.me/?text="+encodeURIComponent(text+"\n"+url),telegram:"https://t.me/share/url?url="+encodedUrl+"&text="+encodedText,facebook:"https://www.facebook.com/sharer/sharer.php?u="+encodedUrl,x:"https://twitter.com/intent/tweet?text="+encodedText+"&url="+encodedUrl};
+      if(links[action]){window.open(links[action],"_blank","noopener,noreferrer,width=720,height=640");markSharedRead(d);closeShare();}
+    }catch(e){log("No se pudo completar la acción de compartir: "+(e?.message||e),"error");}
+  }
+  function markSharedRead(d){if(d.kind==="source")markCardRead(d.id);if(d.kind==="tide")markTideRead(d.id);}
+  function buildSourceShare(source,item){
+    const detail=item.detail||item;const body=Array.isArray(detail.body)?detail.body.join(" "):detail.body||detail.excerpt||item.excerpt||"";
+    return {kind:"source",id:source.id,title:source.name+" · "+(detail.title||item.title||"Actualización"),text:(detail.title||item.title||source.name)+"\n"+(detail.date||item.date||"")+"\n"+body,url:item.href||source.url,image:detail.image||""};
+  }
+  function buildTideShare(region){
+    const rows=state.tideData?.[region]||[];const name=region==="pacifico"?"Mareas · Pacífico":"Mareas · Caribe";
+    const text=rows.length?name+"\n"+rows.map(r=>`${r.type}: ${r.time} · ${r.feet||"—"} ft · ${r.meters||"—"} m`).join("\n")+"\nFuente: IMHPA":"No hay datos de mareas disponibles para compartir.";
+    return {kind:"tide",id:region,title:name,text,url:"https://www.imhpa.gob.pa/es/"};
+  }
+  function popup(source,item,isNew=true){
+    if ($("overlay").classList.contains("show")) {
+      state.popupQueue.push({source,item,isNew});
+      return;
+    }
+    showPopup(source,item,isNew);
+  }
+  function showPopup(source,item,isNew=true){
+    const detail = item.detail || item;
+    state.activePopupShare=buildSourceShare(source,item);
+    $("popupLabel").textContent=isNew?"Nueva publicación detectada":"Última publicación disponible";
+    $("popupTitle").textContent=detail.title || item.title || "Publicación del IMHPA";
+    $("popupMeta").textContent=`${source.name} · ${detail.date || item.date || "Fecha no identificada"}`;
+    const parts=[];
+    if(detail.pron) parts.push("Pronosticador: "+detail.pron);
+    if(detail.validity) parts.push("Validez del aviso: "+detail.validity);
+    if(Array.isArray(detail.body) && detail.body.length) parts.push(detail.body.join("\n\n"));
+    $("popupBody").textContent=parts.join("\n\n") || detail.excerpt || item.excerpt || "No se pudo extraer el contenido completo. Consulta la publicación original.";
+    const image=$("popupImage");
+    if(detail.image){image.src=detail.image;image.style.display="block";}else{image.removeAttribute("src");image.style.display="none";}
+    $("popupLink").href=item.href;
+    $("overlay").classList.add("show");
+    if(isNew) alertUser(source,item);
+    markCardRead(source.id);
+  }
+  function closePopup(){
+    $("overlay").classList.remove("show");
+    const next=state.popupQueue.shift();
+    if(next) setTimeout(()=>showPopup(next.source,next.item,next.isNew),120);
+  }
+  function alertUser(source,item){
+    if($("soundEnabled").checked) playAlert();
+    if("Notification" in window && Notification.permission==="granted"){
+      try {
+        const n=new Notification("HP1CRM Weather Monitor",{body:source.name+": "+item.title,icon:""});
+        n.onclick=()=>{window.focus();window.open(item.href,"_blank","noopener");n.close();};
+      } catch(e){log("No se pudo emitir notificación del sistema: "+e.message,"error");}
+    }
+  }
+  function playAlert(){
+    try {
+      const Ctx=window.AudioContext||window.webkitAudioContext;
+      if(!Ctx) return;
+      if(!state.audio) state.audio=new Ctx();
+      if(state.audio.state==="suspended") state.audio.resume();
+      const ctx=state.audio, now=ctx.currentTime;
+      [880,660,880].forEach((freq,i)=>{
+        const osc=ctx.createOscillator(), gain=ctx.createGain();
+        osc.type="sine"; osc.frequency.value=freq;
+        gain.gain.setValueAtTime(.0001,now+i*.19);
+        gain.gain.exponentialRampToValueAtTime(.22,now+i*.19+.025);
+        gain.gain.exponentialRampToValueAtTime(.0001,now+i*.19+.15);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now+i*.19); osc.stop(now+i*.19+.17);
+      });
+    } catch(e){log("No se pudo reproducir sonido: "+e.message,"error");}
+  }
+  /* ================= Tabla de mareas IMHPA ================= */
+  function parseTideRow(rowElement){
+    const raw=clean(rowElement.innerText||rowElement.textContent||"");
+    const typeMatch=raw.match(/marea\s+(alta|baja)/i);
+    if(!typeMatch)return null;
+    const timeSearch=raw.slice(typeMatch.index+typeMatch[0].length);
+    const timeMatch=timeSearch.match(/\b(\d{1,2}:\d{2})\s*(a\.?\s*m\.?|p\.?\s*m\.?)?/i);
+    if(!timeMatch)return null;
+    const time=(timeMatch[1]+(timeMatch[2]?" "+timeMatch[2].replace(/\s+/g,"").replace(/\./g,"").toLowerCase():"")).trim();
+    const afterTime=timeSearch.slice(timeMatch.index+timeMatch[0].length);
+    const pair=afterTime.match(/(-?\d+(?:[.,]\d+)?)\s*(?:['′]|ft\.?|pies)\s*[,;:\s]*(-?\d+(?:[.,]\d+)?)\s*m\b/i);
+    let feet="", meters="";
+    if(pair){feet=pair[1].replace(",",".");meters=pair[2].replace(",",".");}
+    else{
+      const feetMatch=afterTime.match(/(-?\d+(?:[.,]\d+)?)\s*(?:['′]|ft\.?|pies)/i);
+      const meterMatch=afterTime.match(/(-?\d+(?:[.,]\d+)?)\s*m\b/i);
+      feet=feetMatch?feetMatch[1].replace(",","."):"";
+      meters=meterMatch?meterMatch[1].replace(",","."):"";
+    }
+    return {type:typeMatch[1].toLowerCase()==="alta"?"Marea alta":"Marea baja",kind:typeMatch[1].toLowerCase(),time,feet,meters,raw};
+  }
+  function inferTideRegion(element){
+    let node=element;
+    for(let depth=0;node&&depth<6;depth++,node=node.parentElement){
+      const raw=clean(node.innerText||node.textContent||"");
+      if(raw.length>1800)continue;
+      const normalized=raw.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+      const pac=/(oceano\s+)?pacifico|vertiente\s+del\s+pacifico|litoral\s+pacifico/.test(normalized);
+      const car=/caribe|litoral\s+caribeno|vertiente\s+del\s+caribe/.test(normalized);
+      if(pac&&!car)return "pacifico";
+      if(car&&!pac)return "caribe";
+      // If both names appear in this ancestor, a closer ancestor may still carry a specific label.
+    }
+    return null;
+  }
+  function extractTides(doc){
+    const tableEls=[...doc.querySelectorAll("table")].filter(t=>/marea\s+(?:alta|baja)/i.test(t.textContent||""));
+    let groups=[];
+    for(const table of tableEls){
+      const rows=[...table.querySelectorAll("tr")].map(parseTideRow).filter(Boolean);
+      if(rows.length){
+        const fingerprint=rows.map(r=>r.type+"|"+r.time+"|"+r.feet+"|"+r.meters).join(";");
+        if(!groups.some(g=>g.fingerprint===fingerprint))groups.push({node:table,rows,fingerprint,region:inferTideRegion(table)});
+      }
+    }
+    if(!groups.length){
+      const candidateEls=[...doc.querySelectorAll("tr,li,p,div,span")]
+        .filter(el=>{const t=clean(el.innerText||el.textContent||"");return t.length<240&&/marea\s+(?:alta|baja)/i.test(t)&&/\d{1,2}:\d{2}/.test(t);});
+      const rows=candidateEls.map(parseTideRow).filter(Boolean);
+      const seen=new Set();
+      const unique=rows.filter(r=>{const k=[r.type,r.time,r.feet,r.meters].join("|");if(seen.has(k))return false;seen.add(k);return true;});
+      if(unique.length)groups=[{node:doc.body,rows:unique,fingerprint:"fallback",region:null}];
+    }
+    const result={pacifico:[],caribe:[]};
+    if(groups.length>=2){
+      groups.forEach((group,index)=>{
+        const vals=group.rows.map(r=>Number(r.meters)).filter(Number.isFinite);
+        const maxM=vals.length?Math.max(...vals.map(Math.abs)):0;
+        const magnitudeRegion=vals.length?(maxM>=1.5?"pacifico":(maxM<=0.9?"caribe":null)):null;
+        const region=group.region||magnitudeRegion||(groups.length===2?(index===0?"pacifico":"caribe"):(maxM>=0.8?"pacifico":"caribe"));
+        result[region].push(...group.rows);
+      });
+    }else if(groups.length===1){
+      const g=groups[0];
+      if(g.region)result[g.region].push(...g.rows);
+      else{
+        // La página principal normalmente publica un grupo por vertiente. Si cambia su estructura
+        // y los agrupa, los niveles típicos de mareas se usan solo como regla de separación auxiliar.
+        const highRows=g.rows.filter(r=>Number.isFinite(Number(r.meters))&&Math.abs(Number(r.meters))>=1.5);
+        const lowRows=g.rows.filter(r=>!highRows.includes(r));
+        if(highRows.length&&lowRows.length){result.pacifico.push(...highRows);result.caribe.push(...lowRows);}
+        else if(highRows.length)result.pacifico.push(...highRows);
+        else result.caribe.push(...g.rows);
+      }
+    }
+    for(const region of ["pacifico","caribe"]){
+      const seen=new Set();
+      result[region]=result[region].filter(r=>{const k=[r.type,r.time,r.feet,r.meters].join("|");if(seen.has(k))return false;seen.add(k);return true;});
+    }
+    return result;
+  }
+  function tideSignature(rows){return (rows||[]).map(r=>[r.type,r.time,r.feet,r.meters].join("|" )).join(";");}
+  function markTideRead(region){const card=document.querySelector(`[data-tide-region="${region}"]`);if(card)card.classList.remove("updated");}
+  function renderTideTable(tbody,rows){
+    tbody.textContent="";
+    if(!rows.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=4;td.className="tide-empty";td.textContent="No se pudieron separar datos para esta vertiente en la respuesta recibida.";tr.append(td);tbody.append(tr);return;}
+    for(const row of rows){
+      const tr=document.createElement("tr");
+      const event=document.createElement("td");event.className="tide-event "+row.kind;event.textContent=row.type;
+      const time=document.createElement("td");time.textContent=row.time;
+      const feet=document.createElement("td");feet.textContent=row.feet!==""?row.feet:"—";
+      const meters=document.createElement("td");meters.textContent=row.meters!==""?row.meters:"—";
+      tr.append(event,time,feet,meters);tbody.append(tr);
+    }
+  }
+  let tideBusy=false;
+  async function refreshTides(){
+    if(tideBusy)return;
+    tideBusy=true;
+    const status=$("tideStatus");
+    status.textContent="Consultando tabla oficial de mareas del IMHPA…";
+    try{
+      const pageUrl="https://www.imhpa.gob.pa/es/";
+      const html=await fetchText(pageUrl,"__home__");
+      const doc=parsePage(html,{url:pageUrl});
+      const tides=extractTides(doc);
+      if(!tides.pacifico.length&&!tides.caribe.length)throw new Error("No se encontraron filas de mareas reconocibles en la página principal.");
+      const signatures={pacifico:tideSignature(tides.pacifico),caribe:tideSignature(tides.caribe)};
+      for(const region of ["pacifico","caribe"]){
+        const key="hp1crm:tides:v1.4b:"+region;let previous=null;try{previous=localStorage.getItem(key);}catch{}
+        if(previous!==null&&previous!==signatures[region])document.querySelector(`[data-tide-region="${region}"]`)?.classList.add("updated");
+        try{localStorage.setItem(key,signatures[region]);}catch{}
+      }
+      state.tideData=tides;
+      renderTideTable($("tidePacificRows"),tides.pacifico);
+      renderTideTable($("tideCaribbeanRows"),tides.caribe);
+      const now=new Date();
+      const formatted=new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).format(now);
+      const dateFormatted=new Intl.DateTimeFormat("es-PA",{timeZone:"America/Panama",day:"2-digit",month:"short",year:"numeric"}).format(now);
+      status.textContent="Datos obtenidos de IMHPA · Consultado el "+dateFormatted+" a las "+formatted+" (Panamá GMT−5). "+tides.pacifico.length+" eventos del Pacífico y "+tides.caribe.length+" del Caribe.";
+      log("Tabla de mareas actualizada desde IMHPA: Pacífico "+tides.pacifico.length+" eventos; Caribe "+tides.caribe.length+" eventos.");
+      return true;
+    }catch(error){
+      status.textContent="No se pudo actualizar la tabla de mareas: "+(error?.message||"error desconocido")+". Abre la página oficial de IMHPA para comprobar los datos.";
+      log("Error al consultar tabla de mareas IMHPA: "+(error?.message||"error desconocido"),"error");
+      return false;
+    }finally{tideBusy=false;}
+  }
+  $("refreshTides").addEventListener("click",refreshTides);
+
+  async function checkOne(source){
+    const html=await fetchText(source.url,source.route);const listing=parsePage(html,source);const item=extractLatest(listing,source);const key=normalized(item);
+    const storageKey="hp1crm:latest:v1.2:"+source.id;let previous=null;try{previous=localStorage.getItem(storageKey);}catch{}
+    const cached=state.itemCache[source.id];const detailNeeded=previous===null||previous!==key||!cached||cached.key!==key||!cached.detailOk;
+    let detailOk=false;
+    if(!detailNeeded&&cached?.item){item.detail=cached.item.detail;item.title=cached.item.title||item.title;item.date=cached.item.date||item.date;item.excerpt=cached.item.excerpt||item.excerpt;detailOk=true;}
+    else{
+      try{
+        const detailHtml=await fetchText(item.href);item.detail=extractDetail(detailHtml,item,item.href);item.title=item.detail.title||item.title;item.date=item.detail.date||item.date;
+        item.excerpt=(item.detail.body||[]).join("\n\n")||item.detail.excerpt||"";detailOk=true;
+      }catch(detailError){
+        log("Contenido pendiente en "+source.name+": "+detailError.message+". Se reintentará antes de emitir el popup.","error");
+        item.detail={title:item.title,date:item.date,body:[],excerpt:"Publicación detectada. Recuperando el contenido oficial; el monitor volverá a intentarlo automáticamente."};item.excerpt=item.detail.excerpt;
+      }
+    }
+    state.itemCache[source.id]={key,item:{...item},detailOk};
+    let isNew=false,initial=false;if(previous===null)initial=true;else if(previous!==key)isNew=true;
+    if(detailOk){try{localStorage.setItem(storageKey,key);}catch{}state.known[source.id]=key;if(isNew)log("NUEVA PUBLICACIÓN: "+source.name+" — "+item.title);}
+    renderCard(source,item,detailOk&&isNew,detailOk);
+    return {source,item,isNew,initial,awaitingDetail:!detailOk};
+  }
+  async function checkAll(){
+    if(state.busy) return;
+    state.busy=true; setStatus("Consultando las tres fuentes…","wait");
+    $("checkNow").disabled=true;
+    try {
+      const tideTask=refreshTides();
+      const results=await Promise.all(SOURCES.map(async source=>{
+        try { return await checkOne(source); }
+        catch(e) { log("Error en "+source.name+": "+(e?.message||"fallo de consulta"),"error"); return {source,error:e}; }
+      }));
+      await tideTask;
+      const ok=results.filter(r=>!r.error).length;
+      const failures=results.filter(r=>r.error).length;
+      const now=new Date();
+      $("lastCheck").textContent="Última consulta: "+now.toLocaleTimeString("es-PA",{hour12:false});
+      if(ok===SOURCES.length) setStatus("Conexión correcta · "+state.routeName,"ok");
+      else if(ok>0) setStatus("Conexión parcial: "+ok+" de 3 fuentes","bad");
+      else setStatus("No se pudo conectar con las fuentes","bad");
+      const notices=[];
+      for(const r of results){
+        if(r.error||r.awaitingDetail)continue;
+        const showInitialForSource=r.initial&&$("showInitial").checked&&!state.initialPopupShown[r.source.id];
+        if(r.isNew||showInitialForSource)notices.push(r);
+      }
+      notices.forEach(r=>{
+        if($("visualEnabled").checked){popup(r.source,r.item,!!r.isNew);if(r.initial)state.initialPopupShown[r.source.id]=true;}
+        else if(r.isNew)alertUser(r.source,r.item);
+      });
+      state.started=true;
+    } finally {
+      state.busy=false; $("checkNow").disabled=false;
+    }
+  }
+  function schedule(){
+    if(state.timer) clearInterval(state.timer);
+    const ms=Math.max(30,Number($("interval").value)||600)*1000;
+    state.timer=setInterval(checkAll,ms);
+    log("Intervalo de consulta configurado: "+(ms/1000)+" segundos.");
+  }
+  document.querySelectorAll("[data-popup-source]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const source=SOURCES.find(s=>s.id===button.dataset.popupSource);const cached=source&&state.itemCache[source.id];
+      if(!source||!cached||!cached.detailOk||!cached.item){log("La notificación de esta fuente aún no está disponible; se habilitará cuando se recupere su contenido.","error");return;}
+      popup(source,cached.item,false);
+    });
+  });
+  document.querySelectorAll("[data-share-source]").forEach(button=>button.addEventListener("click",()=>{
+    const source=SOURCES.find(s=>s.id===button.dataset.shareSource);const cached=source&&state.itemCache[source.id];
+    if(!source||!cached?.detailOk||!cached.item){log("La información aún no está disponible para compartir.","error");return;}
+    openShare(buildSourceShare(source,cached.item));
+  }));
+  document.querySelectorAll("[data-tide-region]").forEach(card=>card.addEventListener("click",e=>{if(!e.target.closest("button"))markTideRead(card.dataset.tideRegion);}));
+  document.querySelectorAll("[data-share-tide]").forEach(button=>button.addEventListener("click",()=>openShare(buildTideShare(button.dataset.shareTide))));
+  document.querySelectorAll("[data-share-action]").forEach(button=>button.addEventListener("click",()=>doShare(button.dataset.shareAction)));
+  $("sharePopup").addEventListener("click",()=>{if(state.activePopupShare)openShare(state.activePopupShare);});
+  $("closeShare").addEventListener("click",closeShare);$("cancelShare").addEventListener("click",closeShare);$("shareOverlay").addEventListener("click",e=>{if(e.target===$("shareOverlay"))closeShare();});
+
+  $("reloadAcpRadar").addEventListener("click",()=>{
+    const img=$("acpRadarImage");const base="https://radar-meteorologico.delcanal.com/movie.gif";
+    img.src=base+"?refresh="+Date.now();log("Solicitada una nueva carga de la animación del radar ACP.");
+  });
+  $("checkNow").addEventListener("click",checkAll);
+  $("enableNotifications").addEventListener("click",async()=>{
+    if(!("Notification" in window)){log("Este navegador no admite notificaciones de escritorio.","error");return;}
+    try{
+      const permission=await Notification.requestPermission();
+      if(permission==="granted"){setStatus("Notificaciones del sistema activadas","ok");log("Permiso de notificaciones concedido.");new Notification("HP1CRM Weather Monitor",{body:"Notificaciones activadas correctamente."});}
+      else {log("Permiso de notificaciones: "+permission,"error");alert("El navegador no concedió el permiso. Revisa los permisos del sitio en la configuración del navegador.");}
+    }catch(e){log("No se pudo solicitar permiso: "+e.message,"error");}
+  });
+  $("enableSound").addEventListener("click",async()=>{
+    $("soundEnabled").checked=true;
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext;
+      if(!Ctx) throw new Error("Audio no disponible en este navegador");
+      if(!state.audio) state.audio=new Ctx();
+      await state.audio.resume(); playAlert(); log("Sonido de alerta activado.");
+    }catch(e){log("No se pudo activar sonido: "+e.message,"error");}
+  });
+  $("testPopup").addEventListener("click",()=>{
+    popup({name:"Prueba del sistema"},{title:"Prueba de notificación",date:new Date().toLocaleString("es-PA"),excerpt:"Este es un popup de prueba de HP1CRM Weather Monitor v1.4b. Las publicaciones detectadas aparecerán aquí con el contenido y enlace oficial."},false);
+  });
+  $("closePopup").addEventListener("click",closePopup);
+  $("dismissPopup").addEventListener("click",closePopup);
+  $("overlay").addEventListener("click",e=>{if(e.target===$("overlay"))closePopup();});
+  $("interval").addEventListener("change",schedule);
+  // La primera consulta establece la línea base por fuente; los cambios posteriores se persisten.
+  // El audio requiere una interacción previa y el permiso de notificaciones se solicita desde el botón.
+  schedule();
+  log("Monitor v1.4b iniciado. Intervalo predeterminado: 10 minutos. Fuentes del IMHPA, tabla de mareas, portal de vigilancia y radares ACP/SERVIR cargados.");
+  checkAll().catch(e=>log("Error general del monitor: "+e.message,"error"));
+})();
+</script>
+</body>
+</html>
